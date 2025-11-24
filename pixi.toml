@@ -1,0 +1,47 @@
+[workspace]
+authors = ["Scott Peterson <sm_peterson@yahoo.com>"]
+channels = ["conda-forge"]
+name = "python-env"
+platforms = ["linux-aarch64"]
+version = "0.1.0"
+
+[tasks]
+# Install Qoder CLI
+setup-qoder = """
+curl -fsSL https://qoder.com/install | bash && \
+echo 'export PATH=\"$HOME/.local/bin:$PATH\"' >> ~/.zshrc && \
+echo 'export PATH=\"$HOME/.local/bin:$PATH\"' >> ~/.bashrc
+"""
+
+# Install AI CLI tools via npm
+setup-ai-tools = """
+npm install -g \
+  @google/gemini-cli \
+  @qodo/command \
+  opencode-ai \
+  @openai/codex
+"""
+
+# Install Goose CLI
+setup-goose = """
+curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash
+"""
+
+# Complete setup - installs all dependencies and AI tools
+setup = { depends-on = ["setup-qoder", "setup-ai-tools", "setup-goose"] }
+
+# Verify installation
+check = """
+echo "=== Checking installations ===" && \
+node --version && \
+npm --version && \
+echo "AI CLI tools:" && \
+command -v gemini-cli qodo opencode codex qoder goose 2>&1 || echo "Some tools may not be installed yet"
+"""
+
+[dependencies]
+python = "3.13.*"
+nodejs = "22.*"
+
+[pypi-dependencies]
+modal = ">=1.2.4, <2"
